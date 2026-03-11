@@ -219,29 +219,7 @@
       accent-color: var(--brand);
     }
 
-    .tabbar {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
-    }
 
-    .tab-button {
-      border: 1px solid #d7bcbc;
-      background: #fff;
-      color: var(--brand-dark);
-      padding: 10px 14px;
-      border-radius: 999px;
-      cursor: pointer;
-      font: inherit;
-      font-weight: 700;
-    }
-
-    .tab-button.active {
-      background: var(--brand);
-      color: #fff;
-      border-color: var(--brand);
-    }
 
     .type-panel { display: none; }
     .type-panel.active { display: block; }
@@ -416,14 +394,6 @@
         Kies het juiste rapporttype en vul alleen de velden in die voor dat type relevant zijn. De tool bouwt automatisch
         een gestructureerd rapport op en berekent waar nodig vitals en kosten. De output kan gekopieerd en gelogd worden.
       </p>
-
-      <div class="tabbar">
-        <button type="button" class="tab-button active" data-type="trauma">Trauma</button>
-        <button type="button" class="tab-button" data-type="labo">Labo</button>
-        <button type="button" class="tab-button" data-type="opname">Opname</button>
-        <button type="button" class="tab-button" data-type="operatie">Operatie</button>
-        <button type="button" class="tab-button" data-type="overlijden">Overlijden</button>
-      </div>
     </section>
 
     <div class="layout">
@@ -879,7 +849,6 @@
     const resetBtn = document.getElementById("resetBtn");
     const manualRefreshBtn = document.getElementById("manualRefreshBtn");
     const reportTypeSelect = document.getElementById("reportType");
-    const tabButtons = document.querySelectorAll(".tab-button");
 
     const typeMap = {
       trauma: "Traumarapport",
@@ -945,10 +914,6 @@
     }
 
     function activateType(type) {
-      tabButtons.forEach((btn) => {
-        btn.classList.toggle("active", btn.dataset.type === type);
-      });
-
       document.querySelectorAll(".type-panel").forEach((panel) => {
         panel.classList.toggle("active", panel.id === `panel-${type}`);
       });
@@ -1235,10 +1200,6 @@ ${line("Totaal te factureren", formatMoney(costData.total))}
       clearStatus();
       activateType("trauma");
     }
-
-    tabButtons.forEach((btn) => {
-      btn.addEventListener("click", () => activateType(btn.dataset.type));
-    });
 
     reportTypeSelect.addEventListener("change", () => {
       const selectedType = Object.keys(typeMap).find((key) => typeMap[key] === reportTypeSelect.value) || "trauma";
