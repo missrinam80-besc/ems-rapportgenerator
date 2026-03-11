@@ -1,0 +1,971 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pillbox Hill Medical Center | Rapporttool</title>
+  <style>
+    :root {
+      --page: #ececec;
+      --card: #ffffff;
+      --card-soft: #f8f8f8;
+      --line: #d4d4d4;
+      --text: #1c1c1c;
+      --muted: #666666;
+      --brand: #a70000;
+      --brand-dark: #7d0000;
+      --brand-soft: #f7e8e8;
+      --shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; }
+
+    body {
+      font-family: Georgia, "Times New Roman", serif;
+      background: var(--page);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .app {
+      max-width: 1380px;
+      margin: 0 auto;
+    }
+
+    .site-header {
+      background: var(--card);
+      box-shadow: var(--shadow);
+      border: 1px solid #dfdfdf;
+      margin-bottom: 22px;
+    }
+
+    .site-header img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+
+    .intro {
+      background: var(--card);
+      border: 1px solid #dfdfdf;
+      box-shadow: var(--shadow);
+      padding: 24px 28px;
+      margin-bottom: 22px;
+      position: relative;
+    }
+
+    .intro::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 6px;
+      background: var(--brand);
+    }
+
+    .intro h1 {
+      margin: 0 0 8px;
+      font-size: clamp(1.8rem, 3vw, 2.4rem);
+      color: var(--brand-dark);
+      font-weight: 700;
+    }
+
+    .intro p {
+      margin: 0;
+      line-height: 1.6;
+      color: #3a3a3a;
+      max-width: 980px;
+    }
+
+    .intro-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .tag {
+      padding: 7px 12px;
+      background: var(--brand-soft);
+      border: 1px solid #e7c7c7;
+      color: var(--brand-dark);
+      border-radius: 999px;
+      font-size: 0.88rem;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.3fr) minmax(360px, 0.9fr);
+      gap: 22px;
+      align-items: start;
+    }
+
+    .panel {
+      background: var(--card);
+      border: 1px solid #dfdfdf;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 18px 22px;
+      border-bottom: 1px solid #e6e6e6;
+      background: linear-gradient(180deg, #ffffff, #f8f8f8);
+      position: relative;
+    }
+
+    .panel-header::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 4px;
+      background: var(--brand);
+    }
+
+    .panel-header h2 {
+      margin: 0;
+      color: var(--brand-dark);
+      font-size: 1.3rem;
+    }
+
+    .panel-header p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      line-height: 1.5;
+      font-size: 0.96rem;
+    }
+
+    .panel-body { padding: 22px; }
+
+    .section {
+      margin-bottom: 22px;
+      padding: 18px;
+      background: var(--card-soft);
+      border: 1px solid #ebebeb;
+      border-left: 4px solid var(--brand);
+    }
+
+    .section:last-child { margin-bottom: 0; }
+
+    .section h3 {
+      margin: 0 0 6px;
+      color: var(--brand-dark);
+      font-size: 1.08rem;
+    }
+
+    .section small {
+      display: block;
+      color: var(--muted);
+      margin-bottom: 14px;
+      line-height: 1.5;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      grid-column: span 12;
+    }
+
+    .field.col-6 { grid-column: span 6; }
+    .field.col-4 { grid-column: span 4; }
+    .field.col-3 { grid-column: span 3; }
+
+    label, .group-title {
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #252525;
+    }
+
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #cfcfcf;
+      background: #ffffff;
+      color: var(--text);
+      border-radius: 10px;
+      padding: 11px 12px;
+      outline: none;
+      transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 94px;
+      resize: vertical;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--brand);
+      box-shadow: 0 0 0 4px rgba(167, 0, 0, 0.10);
+      background: #fffdfd;
+    }
+
+    .checkbox-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 10px;
+    }
+
+    .check {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      min-height: 48px;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #dedede;
+      background: #fff;
+    }
+
+    .check input {
+      width: 17px;
+      height: 17px;
+      margin: 0;
+      accent-color: var(--brand);
+    }
+
+    .cost-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .cost-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      background: #fff;
+      border: 1px solid #dddddd;
+      border-radius: 10px;
+      padding: 12px;
+    }
+
+    .cost-label {
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+
+    .cost-label strong { font-size: 0.95rem; }
+    .cost-label span { font-size: 0.85rem; color: var(--muted); }
+
+    .qty-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .qty-wrap input {
+      width: 78px;
+      padding: 9px 10px;
+      text-align: center;
+    }
+
+    .output-wrap {
+      position: sticky;
+      top: 24px;
+    }
+
+    .status {
+      padding: 12px 14px;
+      border-radius: 10px;
+      margin-bottom: 14px;
+      background: #eff8ef;
+      border: 1px solid #cce5cc;
+      color: #285f28;
+      font-size: 0.94rem;
+    }
+
+    .status.error {
+      background: #fdf0f0;
+      border-color: #efc8c8;
+      color: #8b1e1e;
+    }
+
+    .status.hidden { display: none; }
+
+    .output-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    .meta-card {
+      background: var(--card-soft);
+      border: 1px solid #e5e5e5;
+      border-top: 3px solid var(--brand);
+      padding: 12px 14px;
+    }
+
+    .meta-card strong {
+      display: block;
+      margin-bottom: 5px;
+      color: var(--muted);
+      font-size: 0.82rem;
+    }
+
+    .meta-card span {
+      font-weight: 700;
+      color: var(--brand-dark);
+      font-size: 1.02rem;
+    }
+
+    .output {
+      width: 100%;
+      min-height: 760px;
+      resize: vertical;
+      border-radius: 10px;
+      background: #fcfcfc;
+      border: 1px solid #cfcfcf;
+      font-family: "Courier New", Courier, monospace;
+      line-height: 1.5;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    button {
+      border: none;
+      border-radius: 10px;
+      padding: 12px 16px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform .16s ease, opacity .16s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+    button:active { transform: translateY(0); }
+
+    .btn-primary { background: var(--brand); color: #fff; }
+    .btn-secondary { background: #5e5e5e; color: #fff; }
+    .btn-danger { background: #303030; color: #fff; }
+
+    .note, .footer-note {
+      color: var(--muted);
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .footer-note {
+      margin-top: 14px;
+      padding-top: 14px;
+      border-top: 1px solid #e6e6e6;
+    }
+
+    code {
+      background: #f0f0f0;
+      padding: 2px 6px;
+      border-radius: 6px;
+      font-size: 0.88em;
+    }
+
+    @media (max-width: 1180px) {
+      .layout { grid-template-columns: 1fr; }
+      .output-wrap { position: static; }
+      .output { min-height: 460px; }
+    }
+
+    @media (max-width: 780px) {
+      body { padding: 12px; }
+      .panel-body, .panel-header, .intro { padding: 18px; }
+      .field.col-6, .field.col-4, .field.col-3 { grid-column: span 12; }
+      .output-meta, .cost-grid { grid-template-columns: 1fr; }
+      .cost-item { align-items: flex-start; flex-direction: column; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="site-header">
+      <img src="Banner.png" alt="Pillbox Hill Medical Center" />
+    </header>
+
+    <section class="intro">
+      <h1>Pillbox Hill Medical Center Rapporttool</h1>
+      <p>
+        Deze tool helpt EMS-medewerkers om sneller consistente en goed opgebouwde rapporten te schrijven voor consulten,
+        onderzoeken, interventies, opnames en andere medische procedures. De ingevoerde gegevens worden automatisch
+        omgezet naar een gestructureerd verslag en kunnen meteen gekopieerd worden. Bij gebruik van een beveiligde relay
+        wordt tegelijk ook een back-up naar een verborgen Discord-kanaal verzonden.
+      </p>
+      <div class="intro-tags">
+        <span class="tag">Gestructureerde rapportage</span>
+        <span class="tag">Automatische berekeningen</span>
+        <span class="tag">Kostenschatting ziekenhuis</span>
+        <span class="tag">Copy + Discord log</span>
+      </div>
+    </section>
+
+    <div class="layout">
+      <section class="panel">
+        <div class="panel-header">
+          <h2>Invoer</h2>
+          <p>Vul enkel in wat van toepassing is. De output wordt rechts automatisch opgebouwd.</p>
+        </div>
+        <div class="panel-body">
+          <form id="reportForm">
+            <div class="section">
+              <h3>1. Basisgegevens</h3>
+              <small>Algemene identificatie van het rapport, patiënt en context.</small>
+              <div class="grid">
+                <div class="field col-6">
+                  <label for="reportType">Rapporttype</label>
+                  <select id="reportType" name="reportType">
+                    <option value="Algemeen medisch rapport">Algemeen medisch rapport</option>
+                    <option value="Traumarapport">Traumarapport</option>
+                    <option value="Onderzoeksrapport">Onderzoeksrapport</option>
+                    <option value="Operatieverslag">Operatieverslag</option>
+                    <option value="Opnameverslag">Opnameverslag</option>
+                    <option value="Ontslagrapport">Ontslagrapport</option>
+                    <option value="Overlijdensrapport">Overlijdensrapport</option>
+                  </select>
+                </div>
+                <div class="field col-6">
+                  <label for="procedureType">Procedure / onderzoek</label>
+                  <input id="procedureType" name="procedureType" type="text" placeholder="bv. check-in, hechting, bloedonderzoek, X-ray" />
+                </div>
+                <div class="field col-4">
+                  <label for="patientName">Naam patiënt</label>
+                  <input id="patientName" name="patientName" type="text" placeholder="Voornaam Achternaam" />
+                </div>
+                <div class="field col-4">
+                  <label for="patientId">Patiënt-ID / CID</label>
+                  <input id="patientId" name="patientId" type="text" placeholder="ID of registratienummer" />
+                </div>
+                <div class="field col-4">
+                  <label for="dateTime">Datum & tijd</label>
+                  <input id="dateTime" name="dateTime" type="datetime-local" />
+                </div>
+                <div class="field col-4">
+                  <label for="location">Locatie</label>
+                  <input id="location" name="location" type="text" placeholder="Pillbox / OK / incidentlocatie" />
+                </div>
+                <div class="field col-4">
+                  <label for="staffLead">Behandelaar / rapporteur</label>
+                  <input id="staffLead" name="staffLead" type="text" placeholder="Naam + callsign" />
+                </div>
+                <div class="field col-4">
+                  <label for="staffAssist">Assistent(en)</label>
+                  <input id="staffAssist" name="staffAssist" type="text" placeholder="Optioneel" />
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h3>2. Aanmelding en observatie</h3>
+              <small>Kern van de casus, eerste observaties en initiële beoordeling.</small>
+              <div class="grid">
+                <div class="field">
+                  <label for="chiefComplaint">Aanmeldingsreden / klacht</label>
+                  <textarea id="chiefComplaint" name="chiefComplaint" placeholder="Waarom werd de patiënt gezien? Wat is het hoofdprobleem?"></textarea>
+                </div>
+                <div class="field">
+                  <label for="history">Context / anamnese / voorgeschiedenis</label>
+                  <textarea id="history" name="history" placeholder="Mechanisme van letsel, voorgeschiedenis, medicatie, allergieën, relevante context..."></textarea>
+                </div>
+                <div class="field col-6">
+                  <label for="triage">Triage / urgentie</label>
+                  <select id="triage" name="triage">
+                    <option value="Niet gespecificeerd">Niet gespecificeerd</option>
+                    <option value="Rood - kritiek">Rood - kritiek</option>
+                    <option value="Oranje - urgent">Oranje - urgent</option>
+                    <option value="Geel - semi-urgent">Geel - semi-urgent</option>
+                    <option value="Groen - stabiel">Groen - stabiel</option>
+                    <option value="Blauw - geen acute dreiging">Blauw - geen acute dreiging</option>
+                    <option value="Zwart - overleden">Zwart - overleden</option>
+                  </select>
+                </div>
+                <div class="field col-6">
+                  <label for="painScore">Pijnscore (0-10)</label>
+                  <input id="painScore" name="painScore" type="number" min="0" max="10" step="1" placeholder="0-10" />
+                </div>
+                <div class="field">
+                  <label for="physicalExam">Klinische observaties / lichamelijk onderzoek</label>
+                  <textarea id="physicalExam" name="physicalExam" placeholder="Bewustzijn, ademhaling, bloeding, deformiteiten, neurologische tekens, algemene toestand..."></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h3>3. Vitals & berekeningen</h3>
+              <small>MAP en shock index worden automatisch berekend wanneer voldoende gegevens ingevuld zijn.</small>
+              <div class="grid">
+                <div class="field col-3"><label for="sys">Systolische BD</label><input id="sys" name="sys" type="number" min="0" placeholder="mmHg" /></div>
+                <div class="field col-3"><label for="dia">Diastolische BD</label><input id="dia" name="dia" type="number" min="0" placeholder="mmHg" /></div>
+                <div class="field col-3"><label for="hr">Hartslag</label><input id="hr" name="hr" type="number" min="0" placeholder="bpm" /></div>
+                <div class="field col-3"><label for="rr">Ademhaling</label><input id="rr" name="rr" type="number" min="0" placeholder="rpm" /></div>
+                <div class="field col-3"><label for="spo2">SpO₂</label><input id="spo2" name="spo2" type="number" min="0" max="100" placeholder="%" /></div>
+                <div class="field col-3"><label for="temp">Temperatuur</label><input id="temp" name="temp" type="number" step="0.1" placeholder="°C" /></div>
+                <div class="field col-3"><label for="gcs">GCS</label><input id="gcs" name="gcs" type="number" min="3" max="15" placeholder="3-15" /></div>
+                <div class="field col-3"><label for="bloodLoss">Geschat bloedverlies</label><input id="bloodLoss" name="bloodLoss" type="number" min="0" placeholder="ml" /></div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h3>4. Bevindingen en ingrepen</h3>
+              <small>Vink aan wat van toepassing is en licht indien nodig toe.</small>
+              <div class="grid">
+                <div class="field">
+                  <span class="group-title">Bevindingen</span>
+                  <div class="checkbox-grid">
+                    <label class="check"><input type="checkbox" name="findings" value="Actieve bloeding" />Actieve bloeding</label>
+                    <label class="check"><input type="checkbox" name="findings" value="Steekwonde" />Steekwonde</label>
+                    <label class="check"><input type="checkbox" name="findings" value="Schotwonde" />Schotwonde</label>
+                    <label class="check"><input type="checkbox" name="findings" value="Brandwonde" />Brandwonde</label>
+                    <label class="check"><input type="checkbox" name="findings" value="Breuk / fractuur" />Breuk / fractuur</label>
+                    <label class="check"><input type="checkbox" name="findings" value="Contusie / kneuzing" />Contusie / kneuzing</label>
+                    <label class="check"><input type="checkbox" name="findings" value="Neurologische symptomen" />Neurologische symptomen</label>
+                    <label class="check"><input type="checkbox" name="findings" value="Bewustzijnsverlies" />Bewustzijnsverlies</label>
+                    <label class="check"><input type="checkbox" name="findings" value="Respiratoire klachten" />Respiratoire klachten</label>
+                    <label class="check"><input type="checkbox" name="findings" value="Stabiele toestand" />Stabiele toestand</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <span class="group-title">Uitgevoerde handelingen</span>
+                  <div class="checkbox-grid">
+                    <label class="check"><input type="checkbox" name="actions" value="ABCDE-evaluatie" />ABCDE-evaluatie</label>
+                    <label class="check"><input type="checkbox" name="actions" value="Wondreiniging" />Wondreiniging</label>
+                    <label class="check"><input type="checkbox" name="actions" value="Drukverband" />Drukverband</label>
+                    <label class="check"><input type="checkbox" name="actions" value="Tourniquet" />Tourniquet</label>
+                    <label class="check"><input type="checkbox" name="actions" value="Infuus / vochttoediening" />Infuus / vochttoediening</label>
+                    <label class="check"><input type="checkbox" name="actions" value="Immobilisatie" />Immobilisatie</label>
+                    <label class="check"><input type="checkbox" name="actions" value="Hechting / sluiting" />Hechting / sluiting</label>
+                    <label class="check"><input type="checkbox" name="actions" value="Operatieve ingreep" />Operatieve ingreep</label>
+                    <label class="check"><input type="checkbox" name="actions" value="Monitoring" />Monitoring</label>
+                    <label class="check"><input type="checkbox" name="actions" value="Nazorginstructies gegeven" />Nazorginstructies gegeven</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="interventions">Extra toelichting bij handelingen / procedureverloop</label>
+                  <textarea id="interventions" name="interventions" placeholder="Wat werd concreet gedaan, in welke volgorde, en met welk effect?"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h3>5. Medicatie, onderzoeken en resultaat</h3>
+              <small>Geschikt voor labo, beeldvorming, medicatie en samenvattende interpretatie.</small>
+              <div class="grid">
+                <div class="field">
+                  <label for="medications">Toegediende medicatie / hulpmiddelen</label>
+                  <textarea id="medications" name="medications" placeholder="Naam, dosis, route, hulpmiddelen, verbandmateriaal..."></textarea>
+                </div>
+                <div class="field col-6">
+                  <label for="testsOrdered">Aangevraagde onderzoeken</label>
+                  <textarea id="testsOrdered" name="testsOrdered" placeholder="bv. bloedonderzoek, DNA, tox, X-ray, MRI, CT..."></textarea>
+                </div>
+                <div class="field col-6">
+                  <label for="testResults">Resultaten / interpretatie</label>
+                  <textarea id="testResults" name="testResults" placeholder="Samenvatting van de resultaten en medische interpretatie"></textarea>
+                </div>
+                <div class="field">
+                  <label for="diagnosis">Werkdiagnose / conclusie</label>
+                  <textarea id="diagnosis" name="diagnosis" placeholder="Waarschijnlijke diagnose, medische conclusie of eindbeoordeling"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h3>6. Afhandeling</h3>
+              <small>Wat gebeurde er nadien en welke instructies of opvolging werden voorzien?</small>
+              <div class="grid">
+                <div class="field col-6">
+                  <label for="disposition">Eindstatus / afhandeling</label>
+                  <select id="disposition" name="disposition">
+                    <option value="Niet gespecificeerd">Niet gespecificeerd</option>
+                    <option value="Ontslagen ter plaatse">Ontslagen ter plaatse</option>
+                    <option value="Ontslagen uit ziekenhuis">Ontslagen uit ziekenhuis</option>
+                    <option value="Opgenomen ter observatie">Opgenomen ter observatie</option>
+                    <option value="Doorverwezen">Doorverwezen</option>
+                    <option value="Door naar OK">Door naar OK</option>
+                    <option value="Overgebracht naar afdeling">Overgebracht naar afdeling</option>
+                    <option value="Overleden verklaard">Overleden verklaard</option>
+                  </select>
+                </div>
+                <div class="field col-6">
+                  <label for="followUp">Follow-up / controle</label>
+                  <input id="followUp" name="followUp" type="text" placeholder="bv. controle na 24u, hechtingen verwijderen na 7 dagen" />
+                </div>
+                <div class="field">
+                  <label for="aftercare">Nazorg / instructies</label>
+                  <textarea id="aftercare" name="aftercare" placeholder="Rust, wondzorg, medicatie, controle, alarmsymptomen..."></textarea>
+                </div>
+                <div class="field">
+                  <label for="freeNotes">Extra notities</label>
+                  <textarea id="freeNotes" name="freeNotes" placeholder="Optioneel extra veld voor zaken die nergens anders passen"></textarea>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h3>7. Ziekenhuiskosten</h3>
+              <small>Kies een basistarief en voeg enkel de supplementen toe die werkelijk van toepassing zijn. De totaalprijs wordt automatisch berekend.</small>
+              <div class="grid">
+                <div class="field col-6">
+                  <label for="baseCost">Basistarief</label>
+                  <select id="baseCost" name="baseCost">
+                    <option value="500">Standaard check-in / volledig herstel - €500</option>
+                    <option value="750">Ambulante interventie - €750</option>
+                    <option value="1000">Wondzorg / hechting - €1.000</option>
+                    <option value="1200">Beeldvorming / uitgebreid onderzoek - €1.200</option>
+                    <option value="1500">Observatie / korte opname - €1.500</option>
+                    <option value="2000">Intensieve trauma-opvang - €2.000</option>
+                    <option value="3000">Chirurgische ingreep - €3.000</option>
+                    <option value="2000">Overlijdensvaststelling / forensische afhandeling - €2.000</option>
+                  </select>
+                </div>
+                <div class="field col-6">
+                  <label for="customCost">Manuele correctie (€)</label>
+                  <input id="customCost" name="customCost" type="number" step="1" value="0" placeholder="Gebruik + of - voor uitzonderingen" />
+                </div>
+                <div class="field">
+                  <span class="group-title">Supplementen</span>
+                  <div class="cost-grid">
+                    <label class="cost-item">
+                      <span class="cost-label"><strong>Laboratorium</strong><span>€400 per set</span></span>
+                      <span class="qty-wrap">Aantal <input type="number" min="0" step="1" value="0" data-cost="400" data-label="Laboratorium" class="cost-input"></span>
+                    </label>
+                    <label class="cost-item">
+                      <span class="cost-label"><strong>Gips / immobilisatie</strong><span>€600 per toepassing</span></span>
+                      <span class="qty-wrap">Aantal <input type="number" min="0" step="1" value="0" data-cost="600" data-label="Gips / immobilisatie" class="cost-input"></span>
+                    </label>
+                    <label class="cost-item">
+                      <span class="cost-label"><strong>Bloed / transfusie</strong><span>€750 per eenheid</span></span>
+                      <span class="qty-wrap">Aantal <input type="number" min="0" step="1" value="0" data-cost="750" data-label="Bloed / transfusie" class="cost-input"></span>
+                    </label>
+                    <label class="cost-item">
+                      <span class="cost-label"><strong>Narcose / sedatie</strong><span>€500 per keer</span></span>
+                      <span class="qty-wrap">Aantal <input type="number" min="0" step="1" value="0" data-cost="500" data-label="Narcose / sedatie" class="cost-input"></span>
+                    </label>
+                    <label class="cost-item">
+                      <span class="cost-label"><strong>Medicatiepakket</strong><span>€250 per pakket</span></span>
+                      <span class="qty-wrap">Aantal <input type="number" min="0" step="1" value="0" data-cost="250" data-label="Medicatiepakket" class="cost-input"></span>
+                    </label>
+                    <label class="cost-item">
+                      <span class="cost-label"><strong>Opnamedag</strong><span>€850 per dag</span></span>
+                      <span class="qty-wrap">Aantal <input type="number" min="0" step="1" value="0" data-cost="850" data-label="Opnamedag" class="cost-input"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="field">
+                  <label for="costNotes">Kostennotitie</label>
+                  <input id="costNotes" name="costNotes" type="text" placeholder="Optioneel: bv. charity, vrijstelling, intern event, korting..." />
+                </div>
+              </div>
+            </div>
+          </form>
+        </div>
+      </section>
+
+      <aside class="output-wrap">
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Output</h2>
+            <p>Het rapportveld is read-only en klaar om te kopiëren naar MDT, notitieveld of dossier.</p>
+          </div>
+          <div class="panel-body">
+            <div id="statusBox" class="status hidden"></div>
+            <div class="output-meta">
+              <div class="meta-card"><strong>Automatische MAP</strong><span id="mapDisplay">—</span></div>
+              <div class="meta-card"><strong>Shock index</strong><span id="shockDisplay">—</span></div>
+              <div class="meta-card"><strong>Totaalkost</strong><span id="costDisplay">€0</span></div>
+            </div>
+            <textarea id="reportOutput" class="output" readonly></textarea>
+            <div class="actions">
+              <button type="button" class="btn-primary" id="copyBtn">Kopieer + log</button>
+              <button type="button" class="btn-secondary" id="manualRefreshBtn">Herbouw rapport</button>
+              <button type="button" class="btn-danger" id="resetBtn">Reset alles</button>
+            </div>
+            <p class="note">Bij het kopiëren wordt ook geprobeerd een back-up te sturen naar een beveiligde relay. Vul daarvoor in de configuratie onderaan <code>DISCORD_RELAY_URL</code> in.</p>
+            <div class="footer-note">Zet nooit een Discord-webhook rechtstreeks in publieke frontend-code. Gebruik altijd een relay of serverless endpoint tussen de tool en Discord.</div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </div>
+
+  <script>
+    const DISCORD_RELAY_URL = "";
+    const DISCORD_RELAY_TOKEN = "";
+
+    const form = document.getElementById("reportForm");
+    const output = document.getElementById("reportOutput");
+    const mapDisplay = document.getElementById("mapDisplay");
+    const shockDisplay = document.getElementById("shockDisplay");
+    const costDisplay = document.getElementById("costDisplay");
+    const statusBox = document.getElementById("statusBox");
+    const copyBtn = document.getElementById("copyBtn");
+    const resetBtn = document.getElementById("resetBtn");
+    const manualRefreshBtn = document.getElementById("manualRefreshBtn");
+
+    function getValue(id) {
+      return document.getElementById(id)?.value?.trim() || "";
+    }
+
+    function getChecked(name) {
+      return Array.from(document.querySelectorAll(`input[name="${name}"]:checked`)).map((el) => el.value);
+    }
+
+    function formatDateTime(input) {
+      if (!input) return "Niet ingevuld";
+      const date = new Date(input);
+      if (Number.isNaN(date.getTime())) return input;
+      return new Intl.DateTimeFormat("nl-BE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      }).format(date).replace(",", "");
+    }
+
+    function clean(text) {
+      return text.replace(/\n{3,}/g, "\n\n").trim();
+    }
+
+    function joinList(list) {
+      return list.length ? list.join(", ") : "Niet gespecificeerd";
+    }
+
+    function line(label, value) {
+      const finalValue = value && String(value).trim() ? String(value).trim() : "Niet ingevuld";
+      return `${label}: ${finalValue}`;
+    }
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat("nl-BE", {
+        style: "currency",
+        currency: "EUR",
+        maximumFractionDigits: 0
+      }).format(value || 0);
+    }
+
+    function buildCalculations() {
+      const sys = Number(getValue("sys"));
+      const dia = Number(getValue("dia"));
+      const hr = Number(getValue("hr"));
+      let map = null;
+      let shock = null;
+
+      if (sys > 0 && dia >= 0) map = (sys + (2 * dia)) / 3;
+      if (sys > 0 && hr >= 0) shock = hr / sys;
+
+      mapDisplay.textContent = map !== null ? `${map.toFixed(1)} mmHg` : "—";
+      shockDisplay.textContent = shock !== null ? shock.toFixed(2) : "—";
+
+      return {
+        map: map !== null ? `${map.toFixed(1)} mmHg` : "Niet berekend",
+        shock: shock !== null ? shock.toFixed(2) : "Niet berekend"
+      };
+    }
+
+    function buildCosts() {
+      const baseCostSelect = document.getElementById("baseCost");
+      const baseCost = Number(baseCostSelect.value || 0);
+      const baseCostLabel = baseCostSelect.options[baseCostSelect.selectedIndex]?.text || "Niet gespecificeerd";
+      const manualCorrection = Number(getValue("customCost") || 0);
+
+      const supplementLines = [];
+      let supplementTotal = 0;
+
+      document.querySelectorAll(".cost-input").forEach((input) => {
+        const qty = Number(input.value || 0);
+        const unitCost = Number(input.dataset.cost || 0);
+        const label = input.dataset.label || "Supplement";
+        if (qty > 0) {
+          const subtotal = qty * unitCost;
+          supplementTotal += subtotal;
+          supplementLines.push(`${label} x${qty} (${formatMoney(unitCost)}) = ${formatMoney(subtotal)}`);
+        }
+      });
+
+      const total = Math.max(0, baseCost + supplementTotal + manualCorrection);
+      costDisplay.textContent = formatMoney(total);
+
+      return {
+        baseCost,
+        baseCostLabel,
+        supplementTotal,
+        supplementLines,
+        manualCorrection,
+        total,
+        notes: getValue("costNotes")
+      };
+    }
+
+    function generateReport() {
+      const calculations = buildCalculations();
+      const costData = buildCosts();
+      const findings = getChecked("findings");
+      const actions = getChecked("actions");
+
+      const report = `
+=== ${getValue("reportType") || "EMS RAPPORT"} ===
+
+[1. BASISGEGEVENS]
+${line("Procedure / onderzoek", getValue("procedureType"))}
+${line("Naam patiënt", getValue("patientName"))}
+${line("Patiënt-ID", getValue("patientId"))}
+${line("Datum & tijd", formatDateTime(getValue("dateTime")))}
+${line("Locatie", getValue("location"))}
+${line("Behandelaar / rapporteur", getValue("staffLead"))}
+${line("Assistent(en)", getValue("staffAssist"))}
+
+[2. AANMELDING EN OBSERVATIE]
+${line("Aanmeldingsreden / klacht", getValue("chiefComplaint"))}
+${line("Context / anamnese / voorgeschiedenis", getValue("history"))}
+${line("Triage / urgentie", getValue("triage"))}
+${line("Pijnscore", getValue("painScore") ? `${getValue("painScore")}/10` : "")}
+${line("Klinische observaties / lichamelijk onderzoek", getValue("physicalExam"))}
+
+[3. VITALS]
+${line("Bloeddruk", (getValue("sys") || getValue("dia")) ? `${getValue("sys") || "?"}/${getValue("dia") || "?"} mmHg` : "")}
+${line("Hartslag", getValue("hr") ? `${getValue("hr")} bpm` : "")}
+${line("Ademhaling", getValue("rr") ? `${getValue("rr")} rpm` : "")}
+${line("SpO₂", getValue("spo2") ? `${getValue("spo2")}%` : "")}
+${line("Temperatuur", getValue("temp") ? `${getValue("temp")} °C` : "")}
+${line("GCS", getValue("gcs"))}
+${line("Geschat bloedverlies", getValue("bloodLoss") ? `${getValue("bloodLoss")} ml` : "")}
+${line("MAP", calculations.map)}
+${line("Shock index", calculations.shock)}
+
+[4. BEVINDINGEN EN INGREPEN]
+${line("Bevindingen", joinList(findings))}
+${line("Uitgevoerde handelingen", joinList(actions))}
+${line("Toelichting procedureverloop", getValue("interventions"))}
+
+[5. MEDICATIE, ONDERZOEKEN EN RESULTAAT]
+${line("Toegediende medicatie / hulpmiddelen", getValue("medications"))}
+${line("Aangevraagde onderzoeken", getValue("testsOrdered"))}
+${line("Resultaten / interpretatie", getValue("testResults"))}
+${line("Werkdiagnose / conclusie", getValue("diagnosis"))}
+
+[6. AFHANDELING]
+${line("Eindstatus / afhandeling", getValue("disposition"))}
+${line("Follow-up / controle", getValue("followUp"))}
+${line("Nazorg / instructies", getValue("aftercare"))}
+${line("Extra notities", getValue("freeNotes"))}
+
+[7. KOSTEN]
+${line("Basistarief", `${costData.baseCostLabel} (${formatMoney(costData.baseCost)})`)}
+${line("Supplementen", costData.supplementLines.length ? costData.supplementLines.join("; ") : "Geen")}
+${line("Manuele correctie", formatMoney(costData.manualCorrection))}
+${line("Kostennotitie", costData.notes)}
+${line("Totaal te factureren", formatMoney(costData.total))}
+      `;
+
+      output.value = clean(report);
+      return { reportText: output.value, costData };
+    }
+
+    function showStatus(message, type = "ok") {
+      statusBox.textContent = message;
+      statusBox.classList.remove("hidden", "error");
+      if (type === "error") statusBox.classList.add("error");
+    }
+
+    function clearStatus() {
+      statusBox.classList.add("hidden");
+      statusBox.classList.remove("error");
+      statusBox.textContent = "";
+    }
+
+    async function sendToRelay(reportText, costData) {
+      if (!DISCORD_RELAY_URL) return { skipped: true, reason: "Geen relay URL ingesteld" };
+
+      const payload = {
+        reportType: getValue("reportType"),
+        procedureType: getValue("procedureType"),
+        patientName: getValue("patientName"),
+        patientId: getValue("patientId"),
+        dateTime: formatDateTime(getValue("dateTime")),
+        staffLead: getValue("staffLead"),
+        location: getValue("location"),
+        totalCost: costData.total,
+        totalCostFormatted: formatMoney(costData.total),
+        report: reportText,
+        timestamp: new Date().toISOString()
+      };
+
+      const response = await fetch(DISCORD_RELAY_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...(DISCORD_RELAY_TOKEN ? { "x-ems-relay-token": DISCORD_RELAY_TOKEN } : {})
+        },
+        body: JSON.stringify(payload)
+      });
+
+      if (!response.ok) throw new Error(`Relay gaf status ${response.status}`);
+      return response.json().catch(() => ({ ok: true }));
+    }
+
+    async function copyAndLog() {
+      clearStatus();
+      const { reportText, costData } = generateReport();
+
+      try {
+        await navigator.clipboard.writeText(reportText);
+      } catch (error) {
+        showStatus("Kopiëren naar klembord mislukte. Je kan de tekst wel nog manueel selecteren.", "error");
+        return;
+      }
+
+      try {
+        const relayResult = await sendToRelay(reportText, costData);
+        if (relayResult?.skipped) {
+          showStatus(`Rapport gekopieerd. Discord-log werd overgeslagen omdat er nog geen relay is ingesteld. Totale kost: ${formatMoney(costData.total)}.`);
+        } else {
+          showStatus(`Rapport gekopieerd en gelogd naar het interne Discord-kanaal. Totale kost: ${formatMoney(costData.total)}.`);
+        }
+      } catch (error) {
+        showStatus(`Rapport gekopieerd, maar Discord-log mislukte: ${error.message}. Totale kost: ${formatMoney(costData.total)}.`, "error");
+      }
+    }
+
+    function resetForm() {
+      form.reset();
+      document.getElementById("reportType").value = "Algemeen medisch rapport";
+      document.getElementById("triage").value = "Niet gespecificeerd";
+      document.getElementById("disposition").value = "Niet gespecificeerd";
+      document.querySelectorAll(".cost-input").forEach((input) => { input.value = 0; });
+      document.getElementById("baseCost").value = "500";
+      document.getElementById("customCost").value = 0;
+      clearStatus();
+      generateReport();
+    }
+
+    form.addEventListener("input", generateReport);
+    form.addEventListener("change", generateReport);
+    copyBtn.addEventListener("click", copyAndLog);
+    resetBtn.addEventListener("click", resetForm);
+    manualRefreshBtn.addEventListener("click", generateReport);
+
+    document.getElementById("dateTime").value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+
+    generateReport();
+  </script>
+</body>
+</html>
