@@ -405,14 +405,14 @@
       <p>
         Deze tool helpt EMS-medewerkers om sneller consistente en goed opgebouwde rapporten te schrijven voor consulten,
         onderzoeken, interventies, opnames en andere medische procedures. De ingevoerde gegevens worden automatisch
-        omgezet naar een gestructureerd verslag en kunnen meteen gekopieerd worden. Bij gebruik van een beveiligde relay
-        wordt tegelijk ook een back-up naar een verborgen Discord-kanaal verzonden.
+        omgezet naar een gestructureerd verslag en kunnen meteen gekopieerd worden. Bij correct ingestelde logging
+        wordt tegelijk ook een back-up naar Discord en Google Sheets verzonden.
       </p>
       <div class="intro-tags">
         <span class="tag">Gestructureerde rapportage</span>
         <span class="tag">Automatische berekeningen</span>
         <span class="tag">Kostenschatting ziekenhuis</span>
-        <span class="tag">Copy + Discord log</span>
+        <span class="tag">Copy + log</span>
       </div>
     </section>
 
@@ -696,8 +696,12 @@
               <button type="button" class="btn-secondary" id="manualRefreshBtn">Herbouw rapport</button>
               <button type="button" class="btn-danger" id="resetBtn">Reset alles</button>
             </div>
-            <p class="note">Bij het kopiëren wordt ook geprobeerd een back-up te sturen naar een beveiligde relay. Vul daarvoor in de configuratie onderaan <code>DISCORD_RELAY_URL</code> in.</p>
-            <div class="footer-note">Zet nooit een Discord-webhook rechtstreeks in publieke frontend-code. Gebruik altijd een relay of serverless endpoint tussen de tool en Discord.</div>
+            <p class="note">
+              Vul hieronder in de configuratie jouw Google Apps Script Web App URL in. Gebruik altijd de URL die eindigt op <code>/exec</code>.
+            </p>
+            <div class="footer-note">
+              De knop kopieert eerst naar het klembord en probeert daarna het rapport te loggen via Google Apps Script naar Discord en Google Sheets.
+            </div>
           </div>
         </section>
       </aside>
@@ -767,8 +771,12 @@
       let map = null;
       let shock = null;
 
-      if (sys > 0 && dia >= 0) map = (sys + (2 * dia)) / 3;
-      if (sys > 0 && hr >= 0) shock = hr / sys;
+      if (sys > 0 && dia >= 0) {
+        map = (sys + (2 * dia)) / 3;
+      }
+      if (sys > 0 && hr >= 0) {
+        shock = hr / sys;
+      }
 
       mapDisplay.textContent = map !== null ? `${map.toFixed(1)} mmHg` : "—";
       shockDisplay.textContent = shock !== null ? shock.toFixed(2) : "—";
@@ -792,6 +800,7 @@
         const qty = Number(input.value || 0);
         const unitCost = Number(input.dataset.cost || 0);
         const label = input.dataset.label || "Supplement";
+
         if (qty > 0) {
           const subtotal = qty * unitCost;
           supplementTotal += subtotal;
@@ -881,7 +890,9 @@ ${line("Totaal te factureren", formatMoney(costData.total))}
     function showStatus(message, type = "ok") {
       statusBox.textContent = message;
       statusBox.classList.remove("hidden", "error");
-      if (type === "error") statusBox.classList.add("error");
+      if (type === "error") {
+        statusBox.classList.add("error");
+      }
     }
 
     function clearStatus() {
@@ -891,39 +902,47 @@ ${line("Totaal te factureren", formatMoney(costData.total))}
     }
 
     async function sendToRelay(reportText, costData) {
-  if (!DISCORD_RELAY_URL) {
-    return { skipped: true, reason: "Geen relay URL ingesteld" };
-  }
+      if (!DISCORD_RELAY_URL || DISCORD_RELAY_URL.includes("PLAK_HIER")) {
+        return { skipped: true, reason: "Geen relay URL ingesteld" };
+      }
 
-  const payload = {
-    token: DISCORD_RELAY_TOKEN,
-    reportType: getValue("reportType"),
-    procedureType: getValue("procedureType"),
-    patientName: getValue("patientName"),
-    patientId: getValue("patientId"),
-    dateTime: formatDateTime(getValue("dateTime")),
-    staffLead: getValue("staffLead"),
-    location: getValue("location"),
-    totalCost: costData.total,
-    totalCostFormatted: formatMoney(costData.total),
-    report: reportText,
-    timestamp: new Date().toISOString()
-  };
+      const payload = {
+        token: DISCORD_RELAY_TOKEN,
+        reportType: getValue("reportType"),
+        procedureType: getValue("procedureType"),
+        patientName: getValue("patientName"),
+        patientId: getValue("patientId"),
+        dateTime: formatDateTime(getValue("dateTime")),
+        staffLead: getValue("staffLead"),
+        location: getValue("location"),
+        totalCost: costData.total,
+        totalCostFormatted: formatMoney(costData.total),
+        report: reportText,
+        timestamp: new Date().toISOString()
+      };
 
-  const response = await fetch(DISCORD_RELAY_URL, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify(payload)
-  });
+      const response = await fetch(DISCORD_RELAY_URL, {
+        method: "POST",
+        redirect: "follow",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(payload)
+      });
 
-  if (!response.ok) {
-    throw new Error(`Relay gaf status ${response.status}`);
-  }
+      const responseText = await response.text();
 
-  return response.json().catch(() => ({ ok: true }));
-}
+      if (!response.ok) {
+        throw new Error(`Relay gaf status ${response.status}: ${responseText}`);
+      }
+
+      try {
+        return JSON.parse(responseText);
+      } catch {
+        return { ok: true, raw: responseText };
+      }
+    }
+
     async function copyAndLog() {
       clearStatus();
       const { reportText, costData } = generateReport();
@@ -937,13 +956,20 @@ ${line("Totaal te factureren", formatMoney(costData.total))}
 
       try {
         const relayResult = await sendToRelay(reportText, costData);
+
         if (relayResult?.skipped) {
-          showStatus(`Rapport gekopieerd. Discord-log werd overgeslagen omdat er nog geen relay is ingesteld. Totale kost: ${formatMoney(costData.total)}.`);
-        } else {
-          showStatus(`Rapport gekopieerd en gelogd naar het interne Discord-kanaal. Totale kost: ${formatMoney(costData.total)}.`);
+          showStatus(`Rapport gekopieerd. Logging werd overgeslagen omdat er nog geen relay is ingesteld. Totale kost: ${formatMoney(costData.total)}.`);
+          return;
         }
+
+        if (relayResult?.ok) {
+          showStatus(`Rapport gekopieerd en succesvol gelogd. Totale kost: ${formatMoney(costData.total)}.`);
+          return;
+        }
+
+        showStatus(`Rapport gekopieerd. Logging gaf een onverwacht antwoord terug. Totale kost: ${formatMoney(costData.total)}.`, "error");
       } catch (error) {
-        showStatus(`Rapport gekopieerd, maar Discord-log mislukte: ${error.message}. Totale kost: ${formatMoney(costData.total)}.`, "error");
+        showStatus(`Rapport gekopieerd, maar Discord-log mislukte: ${error.message}`, "error");
       }
     }
 
@@ -952,7 +978,9 @@ ${line("Totaal te factureren", formatMoney(costData.total))}
       document.getElementById("reportType").value = "Algemeen medisch rapport";
       document.getElementById("triage").value = "Niet gespecificeerd";
       document.getElementById("disposition").value = "Niet gespecificeerd";
-      document.querySelectorAll(".cost-input").forEach((input) => { input.value = 0; });
+      document.querySelectorAll(".cost-input").forEach((input) => {
+        input.value = 0;
+      });
       document.getElementById("baseCost").value = "500";
       document.getElementById("customCost").value = 0;
       clearStatus();
