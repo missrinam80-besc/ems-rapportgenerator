@@ -705,8 +705,8 @@
   </div>
 
   <script>
-    const DISCORD_RELAY_URL = "";
-    const DISCORD_RELAY_TOKEN = "";
+    const DISCORD_RELAY_URL = "https://script.google.com/macros/s/AKfycbxVpxKVDlUGFbxkX-gLKz7pLlm8T4Ww3JMZ5PPMaIVQGEFE2_2p1xVjhOdYrm6l5PqOcA/exec";
+    const DISCORD_RELAY_TOKEN = "ems-rapport-2026-geheim";
 
     const form = document.getElementById("reportForm");
     const output = document.getElementById("reportOutput");
@@ -891,35 +891,39 @@ ${line("Totaal te factureren", formatMoney(costData.total))}
     }
 
     async function sendToRelay(reportText, costData) {
-      if (!DISCORD_RELAY_URL) return { skipped: true, reason: "Geen relay URL ingesteld" };
+  if (!DISCORD_RELAY_URL) {
+    return { skipped: true, reason: "Geen relay URL ingesteld" };
+  }
 
-      const payload = {
-        reportType: getValue("reportType"),
-        procedureType: getValue("procedureType"),
-        patientName: getValue("patientName"),
-        patientId: getValue("patientId"),
-        dateTime: formatDateTime(getValue("dateTime")),
-        staffLead: getValue("staffLead"),
-        location: getValue("location"),
-        totalCost: costData.total,
-        totalCostFormatted: formatMoney(costData.total),
-        report: reportText,
-        timestamp: new Date().toISOString()
-      };
+  const payload = {
+    token: DISCORD_RELAY_TOKEN,
+    reportType: getValue("reportType"),
+    procedureType: getValue("procedureType"),
+    patientName: getValue("patientName"),
+    patientId: getValue("patientId"),
+    dateTime: formatDateTime(getValue("dateTime")),
+    staffLead: getValue("staffLead"),
+    location: getValue("location"),
+    totalCost: costData.total,
+    totalCostFormatted: formatMoney(costData.total),
+    report: reportText,
+    timestamp: new Date().toISOString()
+  };
 
-      const response = await fetch(DISCORD_RELAY_URL, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(DISCORD_RELAY_TOKEN ? { "x-ems-relay-token": DISCORD_RELAY_TOKEN } : {})
-        },
-        body: JSON.stringify(payload)
-      });
+  const response = await fetch(DISCORD_RELAY_URL, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(payload)
+  });
 
-      if (!response.ok) throw new Error(`Relay gaf status ${response.status}`);
-      return response.json().catch(() => ({ ok: true }));
-    }
+  if (!response.ok) {
+    throw new Error(`Relay gaf status ${response.status}`);
+  }
 
+  return response.json().catch(() => ({ ok: true }));
+}
     async function copyAndLog() {
       clearStatus();
       const { reportText, costData } = generateReport();
