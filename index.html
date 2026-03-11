@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Pillbox Hill Medical Center | Rapporttool</title>
+  <title>Pillbox Hill Medical Center | Rapporttool v2</title>
   <style>
     :root {
       --page: #ececec;
@@ -16,7 +16,6 @@
       --brand-dark: #7d0000;
       --brand-soft: #f7e8e8;
       --shadow: 0 10px 28px rgba(0, 0, 0, 0.08);
-      --radius: 14px;
     }
 
     * { box-sizing: border-box; }
@@ -31,7 +30,7 @@
     }
 
     .app {
-      max-width: 1380px;
+      max-width: 1450px;
       margin: 0 auto;
     }
 
@@ -78,28 +77,12 @@
       margin: 0;
       line-height: 1.6;
       color: #3a3a3a;
-      max-width: 980px;
-    }
-
-    .intro-tags {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 16px;
-    }
-
-    .tag {
-      padding: 7px 12px;
-      background: var(--brand-soft);
-      border: 1px solid #e7c7c7;
-      color: var(--brand-dark);
-      border-radius: 999px;
-      font-size: 0.88rem;
+      max-width: 1100px;
     }
 
     .layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.3fr) minmax(360px, 0.9fr);
+      grid-template-columns: minmax(0, 1.35fr) minmax(360px, 0.95fr);
       gap: 22px;
       align-items: start;
     }
@@ -236,6 +219,33 @@
       accent-color: var(--brand);
     }
 
+    .tabbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .tab-button {
+      border: 1px solid #d7bcbc;
+      background: #fff;
+      color: var(--brand-dark);
+      padding: 10px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+    }
+
+    .tab-button.active {
+      background: var(--brand);
+      color: #fff;
+      border-color: var(--brand);
+    }
+
+    .type-panel { display: none; }
+    .type-panel.active { display: block; }
+
     .cost-grid {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -327,7 +337,7 @@
 
     .output {
       width: 100%;
-      min-height: 760px;
+      min-height: 780px;
       resize: vertical;
       border-radius: 10px;
       background: #fcfcfc;
@@ -401,18 +411,18 @@
     </header>
 
     <section class="intro">
-      <h1>Pillbox Hill Medical Center Rapporttool</h1>
+      <h1>Pillbox Hill Medical Center Rapporttool v2</h1>
       <p>
-        Deze tool helpt EMS-medewerkers om sneller consistente en goed opgebouwde rapporten te schrijven voor consulten,
-        onderzoeken, interventies, opnames en andere medische procedures. De ingevoerde gegevens worden automatisch
-        omgezet naar een gestructureerd verslag en kunnen meteen gekopieerd worden. Bij correct ingestelde logging
-        wordt tegelijk ook een back-up naar Discord en Google Sheets verzonden.
+        Kies het juiste rapporttype en vul alleen de velden in die voor dat type relevant zijn. De tool bouwt automatisch
+        een gestructureerd rapport op en berekent waar nodig vitals en kosten. De output kan gekopieerd en gelogd worden.
       </p>
-      <div class="intro-tags">
-        <span class="tag">Gestructureerde rapportage</span>
-        <span class="tag">Automatische berekeningen</span>
-        <span class="tag">Kostenschatting ziekenhuis</span>
-        <span class="tag">Copy + log</span>
+
+      <div class="tabbar">
+        <button type="button" class="tab-button active" data-type="trauma">Trauma</button>
+        <button type="button" class="tab-button" data-type="labo">Labo</button>
+        <button type="button" class="tab-button" data-type="opname">Opname</button>
+        <button type="button" class="tab-button" data-type="operatie">Operatie</button>
+        <button type="button" class="tab-button" data-type="overlijden">Overlijden</button>
       </div>
     </section>
 
@@ -420,29 +430,27 @@
       <section class="panel">
         <div class="panel-header">
           <h2>Invoer</h2>
-          <p>Vul enkel in wat van toepassing is. De output wordt rechts automatisch opgebouwd.</p>
+          <p>De zichtbare velden passen zich aan aan het gekozen rapporttype.</p>
         </div>
         <div class="panel-body">
           <form id="reportForm">
             <div class="section">
-              <h3>1. Basisgegevens</h3>
-              <small>Algemene identificatie van het rapport, patiënt en context.</small>
+              <h3>Algemene basisgegevens</h3>
+              <small>Deze informatie komt in elk rapporttype terug.</small>
               <div class="grid">
                 <div class="field col-6">
                   <label for="reportType">Rapporttype</label>
                   <select id="reportType" name="reportType">
-                    <option value="Algemeen medisch rapport">Algemeen medisch rapport</option>
                     <option value="Traumarapport">Traumarapport</option>
-                    <option value="Onderzoeksrapport">Onderzoeksrapport</option>
-                    <option value="Operatieverslag">Operatieverslag</option>
+                    <option value="Laboratoriumrapport">Laboratoriumrapport</option>
                     <option value="Opnameverslag">Opnameverslag</option>
-                    <option value="Ontslagrapport">Ontslagrapport</option>
+                    <option value="Operatieverslag">Operatieverslag</option>
                     <option value="Overlijdensrapport">Overlijdensrapport</option>
                   </select>
                 </div>
                 <div class="field col-6">
                   <label for="procedureType">Procedure / onderzoek</label>
-                  <input id="procedureType" name="procedureType" type="text" placeholder="bv. check-in, hechting, bloedonderzoek, X-ray" />
+                  <input id="procedureType" name="procedureType" type="text" placeholder="bv. traumaopvang, DNA-onderzoek, opname, appendectomie..." />
                 </div>
                 <div class="field col-4">
                   <label for="patientName">Naam patiënt</label>
@@ -458,7 +466,7 @@
                 </div>
                 <div class="field col-4">
                   <label for="location">Locatie</label>
-                  <input id="location" name="location" type="text" placeholder="Pillbox / OK / incidentlocatie" />
+                  <input id="location" name="location" type="text" placeholder="Pillbox / labo / OK / mortuarium / incidentlocatie" />
                 </div>
                 <div class="field col-4">
                   <label for="staffLead">Behandelaar / rapporteur</label>
@@ -471,172 +479,314 @@
               </div>
             </div>
 
-            <div class="section">
-              <h3>2. Aanmelding en observatie</h3>
-              <small>Kern van de casus, eerste observaties en initiële beoordeling.</small>
-              <div class="grid">
-                <div class="field">
-                  <label for="chiefComplaint">Aanmeldingsreden / klacht</label>
-                  <textarea id="chiefComplaint" name="chiefComplaint" placeholder="Waarom werd de patiënt gezien? Wat is het hoofdprobleem?"></textarea>
-                </div>
-                <div class="field">
-                  <label for="history">Context / anamnese / voorgeschiedenis</label>
-                  <textarea id="history" name="history" placeholder="Mechanisme van letsel, voorgeschiedenis, medicatie, allergieën, relevante context..."></textarea>
-                </div>
-                <div class="field col-6">
-                  <label for="triage">Triage / urgentie</label>
-                  <select id="triage" name="triage">
-                    <option value="Niet gespecificeerd">Niet gespecificeerd</option>
-                    <option value="Rood - kritiek">Rood - kritiek</option>
-                    <option value="Oranje - urgent">Oranje - urgent</option>
-                    <option value="Geel - semi-urgent">Geel - semi-urgent</option>
-                    <option value="Groen - stabiel">Groen - stabiel</option>
-                    <option value="Blauw - geen acute dreiging">Blauw - geen acute dreiging</option>
-                    <option value="Zwart - overleden">Zwart - overleden</option>
-                  </select>
-                </div>
-                <div class="field col-6">
-                  <label for="painScore">Pijnscore (0-10)</label>
-                  <input id="painScore" name="painScore" type="number" min="0" max="10" step="1" placeholder="0-10" />
-                </div>
-                <div class="field">
-                  <label for="physicalExam">Klinische observaties / lichamelijk onderzoek</label>
-                  <textarea id="physicalExam" name="physicalExam" placeholder="Bewustzijn, ademhaling, bloeding, deformiteiten, neurologische tekens, algemene toestand..."></textarea>
-                </div>
-              </div>
-            </div>
-
-            <div class="section">
-              <h3>3. Vitals & berekeningen</h3>
-              <small>MAP en shock index worden automatisch berekend wanneer voldoende gegevens ingevuld zijn.</small>
-              <div class="grid">
-                <div class="field col-3"><label for="sys">Systolische BD</label><input id="sys" name="sys" type="number" min="0" placeholder="mmHg" /></div>
-                <div class="field col-3"><label for="dia">Diastolische BD</label><input id="dia" name="dia" type="number" min="0" placeholder="mmHg" /></div>
-                <div class="field col-3"><label for="hr">Hartslag</label><input id="hr" name="hr" type="number" min="0" placeholder="bpm" /></div>
-                <div class="field col-3"><label for="rr">Ademhaling</label><input id="rr" name="rr" type="number" min="0" placeholder="rpm" /></div>
-                <div class="field col-3"><label for="spo2">SpO₂</label><input id="spo2" name="spo2" type="number" min="0" max="100" placeholder="%" /></div>
-                <div class="field col-3"><label for="temp">Temperatuur</label><input id="temp" name="temp" type="number" step="0.1" placeholder="°C" /></div>
-                <div class="field col-3"><label for="gcs">GCS</label><input id="gcs" name="gcs" type="number" min="3" max="15" placeholder="3-15" /></div>
-                <div class="field col-3"><label for="bloodLoss">Geschat bloedverlies</label><input id="bloodLoss" name="bloodLoss" type="number" min="0" placeholder="ml" /></div>
-              </div>
-            </div>
-
-            <div class="section">
-              <h3>4. Bevindingen en ingrepen</h3>
-              <small>Vink aan wat van toepassing is en licht indien nodig toe.</small>
-              <div class="grid">
-                <div class="field">
-                  <span class="group-title">Bevindingen</span>
-                  <div class="checkbox-grid">
-                    <label class="check"><input type="checkbox" name="findings" value="Actieve bloeding" />Actieve bloeding</label>
-                    <label class="check"><input type="checkbox" name="findings" value="Steekwonde" />Steekwonde</label>
-                    <label class="check"><input type="checkbox" name="findings" value="Schotwonde" />Schotwonde</label>
-                    <label class="check"><input type="checkbox" name="findings" value="Brandwonde" />Brandwonde</label>
-                    <label class="check"><input type="checkbox" name="findings" value="Breuk / fractuur" />Breuk / fractuur</label>
-                    <label class="check"><input type="checkbox" name="findings" value="Contusie / kneuzing" />Contusie / kneuzing</label>
-                    <label class="check"><input type="checkbox" name="findings" value="Neurologische symptomen" />Neurologische symptomen</label>
-                    <label class="check"><input type="checkbox" name="findings" value="Bewustzijnsverlies" />Bewustzijnsverlies</label>
-                    <label class="check"><input type="checkbox" name="findings" value="Respiratoire klachten" />Respiratoire klachten</label>
-                    <label class="check"><input type="checkbox" name="findings" value="Stabiele toestand" />Stabiele toestand</label>
+            <div id="panel-trauma" class="type-panel active">
+              <div class="section">
+                <h3>Trauma — aanmelding en observatie</h3>
+                <small>Gebruik dit voor verwondingen, acute interventies en spoedprocedures.</small>
+                <div class="grid">
+                  <div class="field">
+                    <label for="chiefComplaint">Aanmeldingsreden / klacht</label>
+                    <textarea id="chiefComplaint" name="chiefComplaint" placeholder="Waarom werd de patiënt gezien?"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="history">Context / mechanisme / voorgeschiedenis</label>
+                    <textarea id="history" name="history" placeholder="Mechanisme van letsel, allergieën, voorgeschiedenis, context..."></textarea>
+                  </div>
+                  <div class="field col-6">
+                    <label for="triage">Triage / urgentie</label>
+                    <select id="triage" name="triage">
+                      <option value="Niet gespecificeerd">Niet gespecificeerd</option>
+                      <option value="Rood - kritiek">Rood - kritiek</option>
+                      <option value="Oranje - urgent">Oranje - urgent</option>
+                      <option value="Geel - semi-urgent">Geel - semi-urgent</option>
+                      <option value="Groen - stabiel">Groen - stabiel</option>
+                      <option value="Blauw - geen acute dreiging">Blauw - geen acute dreiging</option>
+                    </select>
+                  </div>
+                  <div class="field col-6">
+                    <label for="painScore">Pijnscore (0-10)</label>
+                    <input id="painScore" name="painScore" type="number" min="0" max="10" step="1" placeholder="0-10" />
+                  </div>
+                  <div class="field">
+                    <label for="physicalExam">Klinische observaties / lichamelijk onderzoek</label>
+                    <textarea id="physicalExam" name="physicalExam" placeholder="Bewustzijn, ademhaling, bloeding, deformiteiten, neurologische tekens..."></textarea>
                   </div>
                 </div>
-                <div class="field">
-                  <span class="group-title">Uitgevoerde handelingen</span>
-                  <div class="checkbox-grid">
-                    <label class="check"><input type="checkbox" name="actions" value="ABCDE-evaluatie" />ABCDE-evaluatie</label>
-                    <label class="check"><input type="checkbox" name="actions" value="Wondreiniging" />Wondreiniging</label>
-                    <label class="check"><input type="checkbox" name="actions" value="Drukverband" />Drukverband</label>
-                    <label class="check"><input type="checkbox" name="actions" value="Tourniquet" />Tourniquet</label>
-                    <label class="check"><input type="checkbox" name="actions" value="Infuus / vochttoediening" />Infuus / vochttoediening</label>
-                    <label class="check"><input type="checkbox" name="actions" value="Immobilisatie" />Immobilisatie</label>
-                    <label class="check"><input type="checkbox" name="actions" value="Hechting / sluiting" />Hechting / sluiting</label>
-                    <label class="check"><input type="checkbox" name="actions" value="Operatieve ingreep" />Operatieve ingreep</label>
-                    <label class="check"><input type="checkbox" name="actions" value="Monitoring" />Monitoring</label>
-                    <label class="check"><input type="checkbox" name="actions" value="Nazorginstructies gegeven" />Nazorginstructies gegeven</label>
+              </div>
+
+              <div class="section">
+                <h3>Trauma — vitals</h3>
+                <small>MAP en shock index worden automatisch berekend wanneer voldoende gegevens ingevuld zijn.</small>
+                <div class="grid">
+                  <div class="field col-3"><label for="sys">Systolische BD</label><input id="sys" name="sys" type="number" min="0" placeholder="mmHg" /></div>
+                  <div class="field col-3"><label for="dia">Diastolische BD</label><input id="dia" name="dia" type="number" min="0" placeholder="mmHg" /></div>
+                  <div class="field col-3"><label for="hr">Hartslag</label><input id="hr" name="hr" type="number" min="0" placeholder="bpm" /></div>
+                  <div class="field col-3"><label for="rr">Ademhaling</label><input id="rr" name="rr" type="number" min="0" placeholder="rpm" /></div>
+                  <div class="field col-3"><label for="spo2">SpO₂</label><input id="spo2" name="spo2" type="number" min="0" max="100" placeholder="%" /></div>
+                  <div class="field col-3"><label for="temp">Temperatuur</label><input id="temp" name="temp" type="number" step="0.1" placeholder="°C" /></div>
+                  <div class="field col-3"><label for="gcs">GCS</label><input id="gcs" name="gcs" type="number" min="3" max="15" placeholder="3-15" /></div>
+                  <div class="field col-3"><label for="bloodLoss">Geschat bloedverlies</label><input id="bloodLoss" name="bloodLoss" type="number" min="0" placeholder="ml" /></div>
+                </div>
+              </div>
+
+              <div class="section">
+                <h3>Trauma — bevindingen en handelingen</h3>
+                <small>Vink aan wat van toepassing is en licht toe waar nodig.</small>
+                <div class="grid">
+                  <div class="field">
+                    <span class="group-title">Bevindingen</span>
+                    <div class="checkbox-grid">
+                      <label class="check"><input type="checkbox" name="findings" value="Actieve bloeding" />Actieve bloeding</label>
+                      <label class="check"><input type="checkbox" name="findings" value="Steekwonde" />Steekwonde</label>
+                      <label class="check"><input type="checkbox" name="findings" value="Schotwonde" />Schotwonde</label>
+                      <label class="check"><input type="checkbox" name="findings" value="Brandwonde" />Brandwonde</label>
+                      <label class="check"><input type="checkbox" name="findings" value="Breuk / fractuur" />Breuk / fractuur</label>
+                      <label class="check"><input type="checkbox" name="findings" value="Contusie / kneuzing" />Contusie / kneuzing</label>
+                      <label class="check"><input type="checkbox" name="findings" value="Neurologische symptomen" />Neurologische symptomen</label>
+                      <label class="check"><input type="checkbox" name="findings" value="Bewustzijnsverlies" />Bewustzijnsverlies</label>
+                      <label class="check"><input type="checkbox" name="findings" value="Respiratoire klachten" />Respiratoire klachten</label>
+                      <label class="check"><input type="checkbox" name="findings" value="Stabiele toestand" />Stabiele toestand</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <span class="group-title">Uitgevoerde handelingen</span>
+                    <div class="checkbox-grid">
+                      <label class="check"><input type="checkbox" name="actions" value="ABCDE-evaluatie" />ABCDE-evaluatie</label>
+                      <label class="check"><input type="checkbox" name="actions" value="Wondreiniging" />Wondreiniging</label>
+                      <label class="check"><input type="checkbox" name="actions" value="Drukverband" />Drukverband</label>
+                      <label class="check"><input type="checkbox" name="actions" value="Tourniquet" />Tourniquet</label>
+                      <label class="check"><input type="checkbox" name="actions" value="Infuus / vochttoediening" />Infuus / vochttoediening</label>
+                      <label class="check"><input type="checkbox" name="actions" value="Immobilisatie" />Immobilisatie</label>
+                      <label class="check"><input type="checkbox" name="actions" value="Hechting / sluiting" />Hechting / sluiting</label>
+                      <label class="check"><input type="checkbox" name="actions" value="Monitoring" />Monitoring</label>
+                      <label class="check"><input type="checkbox" name="actions" value="Nazorginstructies gegeven" />Nazorginstructies gegeven</label>
+                    </div>
+                  </div>
+                  <div class="field">
+                    <label for="interventions">Procedureverloop</label>
+                    <textarea id="interventions" name="interventions" placeholder="Wat werd concreet gedaan en met welk effect?"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="medications">Toegediende medicatie / hulpmiddelen</label>
+                    <textarea id="medications" name="medications" placeholder="Naam, dosis, route, hulpmiddelen, verbandmateriaal..."></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="diagnosis">Werkdiagnose / conclusie</label>
+                    <textarea id="diagnosis" name="diagnosis" placeholder="Medische conclusie of eindbeoordeling"></textarea>
+                  </div>
+                  <div class="field col-6">
+                    <label for="disposition">Eindstatus / afhandeling</label>
+                    <select id="disposition" name="disposition">
+                      <option value="Niet gespecificeerd">Niet gespecificeerd</option>
+                      <option value="Ontslagen ter plaatse">Ontslagen ter plaatse</option>
+                      <option value="Ontslagen uit ziekenhuis">Ontslagen uit ziekenhuis</option>
+                      <option value="Opgenomen ter observatie">Opgenomen ter observatie</option>
+                      <option value="Door naar OK">Door naar OK</option>
+                      <option value="Overgebracht naar afdeling">Overgebracht naar afdeling</option>
+                    </select>
+                  </div>
+                  <div class="field col-6">
+                    <label for="followUp">Follow-up / controle</label>
+                    <input id="followUp" name="followUp" type="text" placeholder="bv. controle na 24u" />
+                  </div>
+                  <div class="field">
+                    <label for="aftercare">Nazorg / instructies</label>
+                    <textarea id="aftercare" name="aftercare" placeholder="Rust, wondzorg, medicatie, alarmsymptomen..."></textarea>
                   </div>
                 </div>
-                <div class="field">
-                  <label for="interventions">Extra toelichting bij handelingen / procedureverloop</label>
-                  <textarea id="interventions" name="interventions" placeholder="Wat werd concreet gedaan, in welke volgorde, en met welk effect?"></textarea>
+              </div>
+            </div>
+
+            <div id="panel-labo" class="type-panel">
+              <div class="section">
+                <h3>Labo — aanvraag en staalname</h3>
+                <small>Gebruik dit voor bloedonderzoek, DNA, tox, infectieonderzoek, allergietesten en gelijkaardige procedures.</small>
+                <div class="grid">
+                  <div class="field">
+                    <label for="labReason">Aanvraagreden / klinische vraag</label>
+                    <textarea id="labReason" placeholder="Waarom werd het onderzoek aangevraagd? Welke medische vraag moest beantwoord worden?"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="labContext">Relevante context / voorgeschiedenis</label>
+                    <textarea id="labContext" placeholder="Context, medicatie, klachten, vermoeden, relevante medische voorgeschiedenis..."></textarea>
+                  </div>
+                  <div class="field col-6">
+                    <label for="labType">Type labo-onderzoek</label>
+                    <select id="labType">
+                      <option value="Niet gespecificeerd">Niet gespecificeerd</option>
+                      <option value="Bloedonderzoek">Bloedonderzoek</option>
+                      <option value="DNA-onderzoek">DNA-onderzoek</option>
+                      <option value="Verwantschapsonderzoek">Verwantschapsonderzoek</option>
+                      <option value="Toxicologisch onderzoek">Toxicologisch onderzoek</option>
+                      <option value="Infectieonderzoek">Infectieonderzoek</option>
+                      <option value="Allergieonderzoek">Allergieonderzoek</option>
+                    </select>
+                  </div>
+                  <div class="field col-6">
+                    <label for="sampleType">Type staal</label>
+                    <input id="sampleType" type="text" placeholder="bv. bloed, speeksel, urine, weefsel, haarstaal..." />
+                  </div>
+                  <div class="field">
+                    <label for="sampleMethod">Staalname / procedure</label>
+                    <textarea id="sampleMethod" placeholder="Hoe werd het staal afgenomen, gelabeld, veiliggesteld en verwerkt?"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="chainOfCustody">Chain of custody / identificatie</label>
+                    <textarea id="chainOfCustody" placeholder="Identificatie, verzegeling, referentienummer, overdracht, labo-notities..."></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="testsOrdered">Aangevraagde analyses</label>
+                    <textarea id="testsOrdered" name="testsOrdered" placeholder="Welke analyses of vergelijkingen werden aangevraagd?"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="testResults">Resultaten / interpretatie</label>
+                    <textarea id="testResults" name="testResults" placeholder="Samenvatting van de bevindingen en interpretatie"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="labConclusion">Conclusie</label>
+                    <textarea id="labConclusion" placeholder="Eindconclusie van het labo-onderzoek"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="panel-opname" class="type-panel">
+              <div class="section">
+                <h3>Opname — intake</h3>
+                <small>Gebruik dit bij opname ter observatie of verdere behandeling.</small>
+                <div class="grid">
+                  <div class="field">
+                    <label for="admissionReason">Reden van opname</label>
+                    <textarea id="admissionReason" placeholder="Waarom werd de patiënt opgenomen?"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="admissionHistory">Voorgeschiedenis / relevante context</label>
+                    <textarea id="admissionHistory" placeholder="Samenvatting van klachten, voorgeschiedenis, lopende behandeling, medicatie..."></textarea>
+                  </div>
+                  <div class="field col-6">
+                    <label for="admissionWard">Afdeling / kamer</label>
+                    <input id="admissionWard" type="text" placeholder="bv. observatie, chirurgie, ICU..." />
+                  </div>
+                  <div class="field col-6">
+                    <label for="admissionStatus">Toestand bij opname</label>
+                    <input id="admissionStatus" type="text" placeholder="bv. stabiel, onstabiel, postoperatief..." />
+                  </div>
+                  <div class="field">
+                    <label for="admissionExam">Onderzoek en bevindingen</label>
+                    <textarea id="admissionExam" placeholder="Klinische toestand, vitals, verwondingen, observaties..."></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="admissionPlan">Behandelplan / observatieplan</label>
+                    <textarea id="admissionPlan" placeholder="Welke opvolging, monitoring, medicatie of onderzoeken werden voorzien?"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="admissionInstructions">Instructies / afspraken</label>
+                    <textarea id="admissionInstructions" placeholder="Specifieke instructies tijdens opname"></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="panel-operatie" class="type-panel">
+              <div class="section">
+                <h3>Operatie — pre-op, ingreep en post-op</h3>
+                <small>Gebruik dit voor chirurgische ingrepen of procedures in de OK.</small>
+                <div class="grid">
+                  <div class="field">
+                    <label for="surgeryIndication">Indicatie voor ingreep</label>
+                    <textarea id="surgeryIndication" placeholder="Waarom was de operatie medisch noodzakelijk?"></textarea>
+                  </div>
+                  <div class="field col-6">
+                    <label for="surgeryProcedure">Type ingreep</label>
+                    <input id="surgeryProcedure" type="text" placeholder="bv. wondexploratie, fractuurherstel, appendectomie..." />
+                  </div>
+                  <div class="field col-6">
+                    <label for="anesthesiaType">Anesthesie / sedatie</label>
+                    <input id="anesthesiaType" type="text" placeholder="bv. algemene narcose, lokale verdoving..." />
+                  </div>
+                  <div class="field">
+                    <label for="preOpStatus">Pre-operatieve toestand</label>
+                    <textarea id="preOpStatus" placeholder="Toestand voor de ingreep, risico's, voorbereiding..."></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="operativeFindings">Intra-operatieve bevindingen</label>
+                    <textarea id="operativeFindings" placeholder="Wat werd gezien of vastgesteld tijdens de ingreep?"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="operativeCourse">Verloop van de ingreep</label>
+                    <textarea id="operativeCourse" placeholder="Beschrijf de procedure en gebruikte technieken"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="postOpStatus">Post-operatieve toestand</label>
+                    <textarea id="postOpStatus" placeholder="Toestand na de ingreep, complicaties, stabiliteit..."></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="postOpPlan">Post-op plan / nazorg</label>
+                    <textarea id="postOpPlan" placeholder="Opvolging, medicatie, rust, controle, opname of ontslag..."></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div id="panel-overlijden" class="type-panel">
+              <div class="section">
+                <h3>Overlijden — vaststelling en afhandeling</h3>
+                <small>Gebruik dit voor doodverklaring en administratieve of forensische afhandeling.</small>
+                <div class="grid">
+                  <div class="field">
+                    <label for="deceasedContext">Context van aantreffen / overlijden</label>
+                    <textarea id="deceasedContext" placeholder="Situatie, omstandigheden, wie aanwezig was, relevante context..."></textarea>
+                  </div>
+                  <div class="field col-6">
+                    <label for="deceasedTime">Tijdstip overlijden / vaststelling</label>
+                    <input id="deceasedTime" type="text" placeholder="bv. 21:14" />
+                  </div>
+                  <div class="field col-6">
+                    <label for="deceasedPlace">Plaats van overlijden</label>
+                    <input id="deceasedPlace" type="text" placeholder="bv. spoed, OK, incidentlocatie..." />
+                  </div>
+                  <div class="field">
+                    <label for="deathExam">Vaststellingen bij onderzoek</label>
+                    <textarea id="deathExam" placeholder="Geen ademhaling, geen circulatie, geen neurologische respons, letsels..."></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="resuscitationStatus">Reanimatie / voorafgaande interventies</label>
+                    <textarea id="resuscitationStatus" placeholder="Werd er gereanimeerd? Welke handelingen gingen vooraf?"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="presumedCause">Vermoedelijke doodsoorzaak</label>
+                    <textarea id="presumedCause" placeholder="Medisch of voorlopig vermoeden"></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="forensicHandling">Forensische / administratieve afhandeling</label>
+                    <textarea id="forensicHandling" placeholder="Overdracht, veiligstelling, melding, mortuarium, politie..."></textarea>
+                  </div>
+                  <div class="field">
+                    <label for="nextOfKin">Melding familie / bevoegde diensten</label>
+                    <textarea id="nextOfKin" placeholder="Wie werd verwittigd, door wie, en welke verdere afspraken zijn gemaakt?"></textarea>
+                  </div>
                 </div>
               </div>
             </div>
 
             <div class="section">
-              <h3>5. Medicatie, onderzoeken en resultaat</h3>
-              <small>Geschikt voor labo, beeldvorming, medicatie en samenvattende interpretatie.</small>
-              <div class="grid">
-                <div class="field">
-                  <label for="medications">Toegediende medicatie / hulpmiddelen</label>
-                  <textarea id="medications" name="medications" placeholder="Naam, dosis, route, hulpmiddelen, verbandmateriaal..."></textarea>
-                </div>
-                <div class="field col-6">
-                  <label for="testsOrdered">Aangevraagde onderzoeken</label>
-                  <textarea id="testsOrdered" name="testsOrdered" placeholder="bv. bloedonderzoek, DNA, tox, X-ray, MRI, CT..."></textarea>
-                </div>
-                <div class="field col-6">
-                  <label for="testResults">Resultaten / interpretatie</label>
-                  <textarea id="testResults" name="testResults" placeholder="Samenvatting van de resultaten en medische interpretatie"></textarea>
-                </div>
-                <div class="field">
-                  <label for="diagnosis">Werkdiagnose / conclusie</label>
-                  <textarea id="diagnosis" name="diagnosis" placeholder="Waarschijnlijke diagnose, medische conclusie of eindbeoordeling"></textarea>
-                </div>
-              </div>
-            </div>
-
-            <div class="section">
-              <h3>6. Afhandeling</h3>
-              <small>Wat gebeurde er nadien en welke instructies of opvolging werden voorzien?</small>
-              <div class="grid">
-                <div class="field col-6">
-                  <label for="disposition">Eindstatus / afhandeling</label>
-                  <select id="disposition" name="disposition">
-                    <option value="Niet gespecificeerd">Niet gespecificeerd</option>
-                    <option value="Ontslagen ter plaatse">Ontslagen ter plaatse</option>
-                    <option value="Ontslagen uit ziekenhuis">Ontslagen uit ziekenhuis</option>
-                    <option value="Opgenomen ter observatie">Opgenomen ter observatie</option>
-                    <option value="Doorverwezen">Doorverwezen</option>
-                    <option value="Door naar OK">Door naar OK</option>
-                    <option value="Overgebracht naar afdeling">Overgebracht naar afdeling</option>
-                    <option value="Overleden verklaard">Overleden verklaard</option>
-                  </select>
-                </div>
-                <div class="field col-6">
-                  <label for="followUp">Follow-up / controle</label>
-                  <input id="followUp" name="followUp" type="text" placeholder="bv. controle na 24u, hechtingen verwijderen na 7 dagen" />
-                </div>
-                <div class="field">
-                  <label for="aftercare">Nazorg / instructies</label>
-                  <textarea id="aftercare" name="aftercare" placeholder="Rust, wondzorg, medicatie, controle, alarmsymptomen..."></textarea>
-                </div>
-                <div class="field">
-                  <label for="freeNotes">Extra notities</label>
-                  <textarea id="freeNotes" name="freeNotes" placeholder="Optioneel extra veld voor zaken die nergens anders passen"></textarea>
-                </div>
-              </div>
-            </div>
-
-            <div class="section">
-              <h3>7. Ziekenhuiskosten</h3>
-              <small>Kies een basistarief en voeg enkel de supplementen toe die werkelijk van toepassing zijn. De totaalprijs wordt automatisch berekend.</small>
+              <h3>Ziekenhuiskosten</h3>
+              <small>Basistarief en supplementen. De totaalprijs wordt automatisch berekend.</small>
               <div class="grid">
                 <div class="field col-6">
                   <label for="baseCost">Basistarief</label>
                   <select id="baseCost" name="baseCost">
-                    <option value="500">Standaard check-in / volledig herstel - €500</option>
-                    <option value="750">Ambulante interventie - €750</option>
-                    <option value="1000">Wondzorg / hechting - €1.000</option>
-                    <option value="1200">Beeldvorming / uitgebreid onderzoek - €1.200</option>
-                    <option value="1500">Observatie / korte opname - €1.500</option>
-                    <option value="2000">Intensieve trauma-opvang - €2.000</option>
+                    <option value="2000">Trauma-opvang - €2.000</option>
+                    <option value="1200">Labo / uitgebreid onderzoek - €1.200</option>
+                    <option value="1500">Opname / observatie - €1.500</option>
                     <option value="3000">Chirurgische ingreep - €3.000</option>
                     <option value="2000">Overlijdensvaststelling / forensische afhandeling - €2.000</option>
+                    <option value="500">Standaard check-in / volledig herstel - €500</option>
                   </select>
                 </div>
                 <div class="field col-6">
                   <label for="customCost">Manuele correctie (€)</label>
-                  <input id="customCost" name="customCost" type="number" step="1" value="0" placeholder="Gebruik + of - voor uitzonderingen" />
+                  <input id="customCost" name="customCost" type="number" step="1" value="0" />
                 </div>
                 <div class="field">
                   <span class="group-title">Supplementen</span>
@@ -669,7 +819,18 @@
                 </div>
                 <div class="field">
                   <label for="costNotes">Kostennotitie</label>
-                  <input id="costNotes" name="costNotes" type="text" placeholder="Optioneel: bv. charity, vrijstelling, intern event, korting..." />
+                  <input id="costNotes" name="costNotes" type="text" placeholder="bv. intern event, vrijstelling, correctie..." />
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <h3>Extra notities</h3>
+              <small>Optioneel algemeen veld voor zaken die nergens anders passen.</small>
+              <div class="grid">
+                <div class="field">
+                  <label for="freeNotes">Extra notities</label>
+                  <textarea id="freeNotes" name="freeNotes" placeholder="Vrije notities"></textarea>
                 </div>
               </div>
             </div>
@@ -696,12 +857,8 @@
               <button type="button" class="btn-secondary" id="manualRefreshBtn">Herbouw rapport</button>
               <button type="button" class="btn-danger" id="resetBtn">Reset alles</button>
             </div>
-            <p class="note">
-              Vul hieronder in de configuratie jouw Google Apps Script Web App URL in. Gebruik altijd de URL die eindigt op <code>/exec</code>.
-            </p>
-            <div class="footer-note">
-              De knop kopieert eerst naar het klembord en probeert daarna het rapport te loggen via Google Apps Script naar Discord en Google Sheets.
-            </div>
+            <p class="note">Gebruik de Google Apps Script Web App URL die eindigt op <code>/exec</code>.</p>
+            <div class="footer-note">De loggingcode kan dezelfde blijven als in je vorige versie.</div>
           </div>
         </section>
       </aside>
@@ -721,6 +878,24 @@
     const copyBtn = document.getElementById("copyBtn");
     const resetBtn = document.getElementById("resetBtn");
     const manualRefreshBtn = document.getElementById("manualRefreshBtn");
+    const reportTypeSelect = document.getElementById("reportType");
+    const tabButtons = document.querySelectorAll(".tab-button");
+
+    const typeMap = {
+      trauma: "Traumarapport",
+      labo: "Laboratoriumrapport",
+      opname: "Opnameverslag",
+      operatie: "Operatieverslag",
+      overlijden: "Overlijdensrapport"
+    };
+
+    const baseCostByType = {
+      trauma: "2000",
+      labo: "1200",
+      opname: "1500",
+      operatie: "3000",
+      overlijden: "2000"
+    };
 
     function getValue(id) {
       return document.getElementById(id)?.value?.trim() || "";
@@ -764,6 +939,25 @@
       }).format(value || 0);
     }
 
+    function getCurrentTypeKey() {
+      const value = reportTypeSelect.value;
+      return Object.keys(typeMap).find((key) => typeMap[key] === value) || "trauma";
+    }
+
+    function activateType(type) {
+      tabButtons.forEach((btn) => {
+        btn.classList.toggle("active", btn.dataset.type === type);
+      });
+
+      document.querySelectorAll(".type-panel").forEach((panel) => {
+        panel.classList.toggle("active", panel.id === `panel-${type}`);
+      });
+
+      reportTypeSelect.value = typeMap[type];
+      document.getElementById("baseCost").value = baseCostByType[type] || "500";
+      generateReport();
+    }
+
     function buildCalculations() {
       const sys = Number(getValue("sys"));
       const dia = Number(getValue("dia"));
@@ -771,12 +965,8 @@
       let map = null;
       let shock = null;
 
-      if (sys > 0 && dia >= 0) {
-        map = (sys + (2 * dia)) / 3;
-      }
-      if (sys > 0 && hr >= 0) {
-        shock = hr / sys;
-      }
+      if (sys > 0 && dia >= 0) map = (sys + (2 * dia)) / 3;
+      if (sys > 0 && hr >= 0) shock = hr / sys;
 
       mapDisplay.textContent = map !== null ? `${map.toFixed(1)} mmHg` : "—";
       shockDisplay.textContent = shock !== null ? shock.toFixed(2) : "—";
@@ -822,32 +1012,17 @@
       };
     }
 
-    function generateReport() {
-      const calculations = buildCalculations();
-      const costData = buildCosts();
-      const findings = getChecked("findings");
-      const actions = getChecked("actions");
-
-      const report = `
-=== ${getValue("reportType") || "EMS RAPPORT"} ===
-
-[1. BASISGEGEVENS]
-${line("Procedure / onderzoek", getValue("procedureType"))}
-${line("Naam patiënt", getValue("patientName"))}
-${line("Patiënt-ID", getValue("patientId"))}
-${line("Datum & tijd", formatDateTime(getValue("dateTime")))}
-${line("Locatie", getValue("location"))}
-${line("Behandelaar / rapporteur", getValue("staffLead"))}
-${line("Assistent(en)", getValue("staffAssist"))}
-
-[2. AANMELDING EN OBSERVATIE]
+    function buildTypeSpecificReport(type, calculations) {
+      if (type === "trauma") {
+        return `
+[TRAUMA]
 ${line("Aanmeldingsreden / klacht", getValue("chiefComplaint"))}
-${line("Context / anamnese / voorgeschiedenis", getValue("history"))}
+${line("Context / mechanisme / voorgeschiedenis", getValue("history"))}
 ${line("Triage / urgentie", getValue("triage"))}
 ${line("Pijnscore", getValue("painScore") ? `${getValue("painScore")}/10` : "")}
 ${line("Klinische observaties / lichamelijk onderzoek", getValue("physicalExam"))}
 
-[3. VITALS]
+[VITALS]
 ${line("Bloeddruk", (getValue("sys") || getValue("dia")) ? `${getValue("sys") || "?"}/${getValue("dia") || "?"} mmHg` : "")}
 ${line("Hartslag", getValue("hr") ? `${getValue("hr")} bpm` : "")}
 ${line("Ademhaling", getValue("rr") ? `${getValue("rr")} rpm` : "")}
@@ -858,24 +1033,101 @@ ${line("Geschat bloedverlies", getValue("bloodLoss") ? `${getValue("bloodLoss")}
 ${line("MAP", calculations.map)}
 ${line("Shock index", calculations.shock)}
 
-[4. BEVINDINGEN EN INGREPEN]
-${line("Bevindingen", joinList(findings))}
-${line("Uitgevoerde handelingen", joinList(actions))}
-${line("Toelichting procedureverloop", getValue("interventions"))}
-
-[5. MEDICATIE, ONDERZOEKEN EN RESULTAAT]
-${line("Toegediende medicatie / hulpmiddelen", getValue("medications"))}
-${line("Aangevraagde onderzoeken", getValue("testsOrdered"))}
-${line("Resultaten / interpretatie", getValue("testResults"))}
+[BEVINDINGEN EN HANDLINGEN]
+${line("Bevindingen", joinList(getChecked("findings")))}
+${line("Uitgevoerde handelingen", joinList(getChecked("actions")))}
+${line("Procedureverloop", getValue("interventions"))}
+${line("Medicatie / hulpmiddelen", getValue("medications"))}
 ${line("Werkdiagnose / conclusie", getValue("diagnosis"))}
-
-[6. AFHANDELING]
 ${line("Eindstatus / afhandeling", getValue("disposition"))}
 ${line("Follow-up / controle", getValue("followUp"))}
 ${line("Nazorg / instructies", getValue("aftercare"))}
+        `;
+      }
+
+      if (type === "labo") {
+        return `
+[LABO]
+${line("Aanvraagreden / klinische vraag", getValue("labReason"))}
+${line("Relevante context / voorgeschiedenis", getValue("labContext"))}
+${line("Type labo-onderzoek", getValue("labType"))}
+${line("Type staal", getValue("sampleType"))}
+${line("Staalname / procedure", getValue("sampleMethod"))}
+${line("Chain of custody / identificatie", getValue("chainOfCustody"))}
+${line("Aangevraagde analyses", getValue("testsOrdered"))}
+${line("Resultaten / interpretatie", getValue("testResults"))}
+${line("Conclusie", getValue("labConclusion"))}
+        `;
+      }
+
+      if (type === "opname") {
+        return `
+[OPNAME]
+${line("Reden van opname", getValue("admissionReason"))}
+${line("Voorgeschiedenis / relevante context", getValue("admissionHistory"))}
+${line("Afdeling / kamer", getValue("admissionWard"))}
+${line("Toestand bij opname", getValue("admissionStatus"))}
+${line("Onderzoek en bevindingen", getValue("admissionExam"))}
+${line("Behandelplan / observatieplan", getValue("admissionPlan"))}
+${line("Instructies / afspraken", getValue("admissionInstructions"))}
+        `;
+      }
+
+      if (type === "operatie") {
+        return `
+[OPERATIE]
+${line("Indicatie voor ingreep", getValue("surgeryIndication"))}
+${line("Type ingreep", getValue("surgeryProcedure"))}
+${line("Anesthesie / sedatie", getValue("anesthesiaType"))}
+${line("Pre-operatieve toestand", getValue("preOpStatus"))}
+${line("Intra-operatieve bevindingen", getValue("operativeFindings"))}
+${line("Verloop van de ingreep", getValue("operativeCourse"))}
+${line("Post-operatieve toestand", getValue("postOpStatus"))}
+${line("Post-op plan / nazorg", getValue("postOpPlan"))}
+        `;
+      }
+
+      if (type === "overlijden") {
+        return `
+[OVERLIJDEN]
+${line("Context van aantreffen / overlijden", getValue("deceasedContext"))}
+${line("Tijdstip overlijden / vaststelling", getValue("deceasedTime"))}
+${line("Plaats van overlijden", getValue("deceasedPlace"))}
+${line("Vaststellingen bij onderzoek", getValue("deathExam"))}
+${line("Reanimatie / voorafgaande interventies", getValue("resuscitationStatus"))}
+${line("Vermoedelijke doodsoorzaak", getValue("presumedCause"))}
+${line("Forensische / administratieve afhandeling", getValue("forensicHandling"))}
+${line("Melding familie / bevoegde diensten", getValue("nextOfKin"))}
+        `;
+      }
+
+      return "";
+    }
+
+    function generateReport() {
+      const calculations = buildCalculations();
+      const costData = buildCosts();
+      const currentType = getCurrentTypeKey();
+      const typeSpecific = buildTypeSpecificReport(currentType, calculations);
+
+      const report = `
+=== ${getValue("reportType") || "EMS RAPPORT"} ===
+
+[ALGEMENE BASISGEGEVENS]
+${line("Procedure / onderzoek", getValue("procedureType"))}
+${line("Naam patiënt", getValue("patientName"))}
+${line("Patiënt-ID", getValue("patientId"))}
+${line("Datum & tijd", formatDateTime(getValue("dateTime")))}
+${line("Locatie", getValue("location"))}
+${line("Behandelaar / rapporteur", getValue("staffLead"))}
+${line("Assistent(en)", getValue("staffAssist"))}
+
+${typeSpecific}
+
+[ALGEMENE EXTRA NOTITIES]
 ${line("Extra notities", getValue("freeNotes"))}
 
-[7. KOSTEN]
+[KOSTEN]
 ${line("Basistarief", `${costData.baseCostLabel} (${formatMoney(costData.baseCost)})`)}
 ${line("Supplementen", costData.supplementLines.length ? costData.supplementLines.join("; ") : "Geen")}
 ${line("Manuele correctie", formatMoney(costData.manualCorrection))}
@@ -890,9 +1142,7 @@ ${line("Totaal te factureren", formatMoney(costData.total))}
     function showStatus(message, type = "ok") {
       statusBox.textContent = message;
       statusBox.classList.remove("hidden", "error");
-      if (type === "error") {
-        statusBox.classList.add("error");
-      }
+      if (type === "error") statusBox.classList.add("error");
     }
 
     function clearStatus() {
@@ -975,17 +1225,25 @@ ${line("Totaal te factureren", formatMoney(costData.total))}
 
     function resetForm() {
       form.reset();
-      document.getElementById("reportType").value = "Algemeen medisch rapport";
-      document.getElementById("triage").value = "Niet gespecificeerd";
-      document.getElementById("disposition").value = "Niet gespecificeerd";
       document.querySelectorAll(".cost-input").forEach((input) => {
         input.value = 0;
       });
-      document.getElementById("baseCost").value = "500";
       document.getElementById("customCost").value = 0;
+      document.getElementById("dateTime").value = new Date(Date.now() - new Date().getTimezoneOffset() * 60000)
+        .toISOString()
+        .slice(0, 16);
       clearStatus();
-      generateReport();
+      activateType("trauma");
     }
+
+    tabButtons.forEach((btn) => {
+      btn.addEventListener("click", () => activateType(btn.dataset.type));
+    });
+
+    reportTypeSelect.addEventListener("change", () => {
+      const selectedType = Object.keys(typeMap).find((key) => typeMap[key] === reportTypeSelect.value) || "trauma";
+      activateType(selectedType);
+    });
 
     form.addEventListener("input", generateReport);
     form.addEventListener("change", generateReport);
@@ -997,7 +1255,7 @@ ${line("Totaal te factureren", formatMoney(costData.total))}
       .toISOString()
       .slice(0, 16);
 
-    generateReport();
+    activateType("trauma");
   </script>
 </body>
 </html>
